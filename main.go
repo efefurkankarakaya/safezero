@@ -18,14 +18,14 @@ func main() {
 		"/Applications", "/Library", "System", "/Users",
 		"A:", "B:", "C:", "E:", "D:", "F:", "G:", "H:", "I:", "J:", "K:", "L:", "M:", "N:", "O:", "P:", "Q:", "R:", "S:", "T:", "U:", "V:", "W:", "X:", "Y:", "Z:",
 		// TODO: Does Windows still allows to use another partition rather than C as a system partition?
-		// TODO: Add more Windows-specific critical paths
+		// TODO: Add more Windows-specific critical paths.
 	}
 
 	for _, criticalPath := range criticalPaths {
 		// TODO: strings.equalFold() here (add with unit test)
 		if strings.ToLower(criticalPath) == strings.ToLower(root) {
 			fmt.Println(criticalPath)
-			os.Exit(1) // TODO: Use instead ReflectError but first rewrite this block as a function
+			os.Exit(1) // TODO: Use instead ReflectError but first rewrite this block as a function.
 		}
 	}
 

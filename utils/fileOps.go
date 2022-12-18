@@ -17,7 +17,7 @@ func CheckIfPathExists(path string) bool {
 }
 
 func createDirectory(path string) error {
-	// TODO: Check if path exists
+	// TODO: Check if path exists.
 	message := "Folder created: " + path
 	err := os.Mkdir(path, os.ModePerm)
 	PrintSuccess(message, err)
@@ -35,7 +35,8 @@ func RemoveDirectory(path string) error {
 }
 
 func RemoveTree(root string) {
-	// TODO: Remove tree
+	// TODO: Remove tree.
+	// https://pkg.go.dev/os#RemoveAll
 }
 
 func CopyRecursive(source string, destination string) error {
@@ -44,7 +45,7 @@ func CopyRecursive(source string, destination string) error {
 			return err
 		}
 
-		// TODO: Don't forget to add this to other walk functions
+		// TODO: Don't forget to add this to other walk functions.
 		if !fileInfo.IsDir() {
 			_, err = CopyFile(path, destination+"/"+fileInfo.Name())
 		}

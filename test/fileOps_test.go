@@ -2,6 +2,7 @@ package test
 
 import (
 	"os"
+	"path/filepath"
 	"safezero/utils"
 	"testing"
 )
@@ -56,9 +57,70 @@ func TestCreatingTestingEnvironment(t *testing.T) {
 }
 
 func TestFileOverwriting(t *testing.T) {
+	const want int64 = 0
 
+	var got int64
+	var message string
+	var size int64
+	var file os.FileInfo
+
+	const testDir string = "temp/"
+
+	filepath.Walk(testDir, func(path string, fileInfo os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		file, err = os.Stat(path)
+		if err != nil {
+			return err
+		}
+
+		size = file.Size()
+
+		utils.OverwriteFile(path)
+
+		file, err = os.Stat(path)
+		if err != nil {
+			return err
+		}
+
+		size = file.Size()
+
+		got = size
+
+		return err
+	})
+
+	if got != want {
+		message = "Overwrite test failed."
+		t.Errorf(message)
+	}
 }
 
 func TestFileDeletion(t *testing.T) {
+	const want bool = false
+	const testDir string = "temp/"
+
+	var got bool
+	var message string
+
+	filepath.Walk(testDir, func(path string, fileInfo os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		utils.RemoveFile(path)
+
+		got = utils.CheckIfPathExists(path)
+		println(got)
+
+		return err
+	})
+
+	if got != want {
+		message = "File deletion test failed."
+		t.Errorf(message)
+	}
 
 }

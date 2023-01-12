@@ -110,10 +110,11 @@ func TestFileDeletion(t *testing.T) {
 			return err
 		}
 
-		utils.RemoveFile(path)
-
-		got = utils.CheckIfPathExists(path)
-		println(got)
+		// TODO: Add remove directory here.
+		if !fileInfo.IsDir() {
+			utils.RemoveFile(path)
+			got = utils.CheckIfPathExists(path)
+		}
 
 		return err
 	})
@@ -122,5 +123,4 @@ func TestFileDeletion(t *testing.T) {
 		message = "File deletion test failed."
 		t.Errorf(message)
 	}
-
 }

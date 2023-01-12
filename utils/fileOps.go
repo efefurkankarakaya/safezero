@@ -28,15 +28,19 @@ func createDirectory(path string) error {
 }
 
 func RemoveDirectory(path string) error {
-	err := os.Remove(path)
 	message := "Folder removed: " + path
+	err := os.Remove(path)
 	PrintSuccess(message, err)
 	return err
 }
 
-func RemoveTree(root string) {
+func RemoveTree(root string) error {
 	// TODO: Remove tree.
 	// https://pkg.go.dev/os#RemoveAll
+	message := "Tree removed: " + root
+	err := os.RemoveAll(root)
+	PrintSuccess(message, err)
+	return err
 }
 
 func CopyRecursive(source string, destination string) error {

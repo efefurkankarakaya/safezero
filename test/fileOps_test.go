@@ -124,3 +124,24 @@ func TestFileDeletion(t *testing.T) {
 		t.Errorf(message)
 	}
 }
+
+func TestTreeDeletion(t *testing.T) {
+	const want bool = false
+	const testDir string = "temp/"
+
+	var got bool
+	var message string
+
+	err := utils.RemoveTree(testDir)
+	if err != nil {
+		message = "Error occurred while removing tree."
+		t.Errorf(message)
+	}
+
+	got = utils.CheckIfPathExists(testDir)
+
+	if got != want {
+		message = "Could not removed tree."
+		t.Errorf(message)
+	}
+}

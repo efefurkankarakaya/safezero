@@ -3,10 +3,11 @@ package utils
 import (
 	"fmt"
 	"io"
-	"io/fs"
-	"io/ioutil" // TODO: Deprecated. Use instead os by adding unit tests.
+	"io/fs" // TODO: Deprecated. Use instead os by adding unit tests.
+	"math/rand"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // TODO: fileController.go?
@@ -86,16 +87,57 @@ func CopyFile(source, destination string) (int64, error) {
 	return numberOfBytes, err
 }
 
-func OverwriteFile(path string) error {
+func OverwriteFileZeroBytes(path string) error {
 	message := "File overwrote: " + path
 
 	data := []byte("")
-	err := ioutil.WriteFile(path, data, 0644) // TODO: Should I consider provide a dynamic chmod input to user?
-	// err := os.WriteFile(path, data, 0644) // TODO: Test here after migrating from ioutil to os
+	err := os.WriteFile(path, data, 0644)
 
 	PrintSuccess(message, err)
 	return err
 }
+
+// For SSDs
+func OverwriteFileRandomSize(path string) error {
+	message := "File overwrote (with random size): " + path
+	var characterLength int
+	var data string
+	var randomIndex int
+
+	var characters []rune = []rune{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'y', 'z', 'q', 'x', 'w'}
+	var numbers []rune = []rune{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+	var specials []rune = []rune{'\'', '"', '!', '^', '+', '%', '&', '/', '(', ')', '=', '?', '_', ',', ';', '.', '*', '-', '<', '>', '#', '$', '{', '}', '[', ']', '|'}
+
+	rand.Seed(time.Now().UnixMicro())
+	const min int = 4095
+	const max int = 65535
+
+	characterLength = rand.Intn(max-min+1) + min
+
+	var typeOfCharacter int
+	for i := 0; i < characterLength; i++ {
+		typeOfCharacter = rand.Intn(3)
+		switch typeOfCharacter {
+		case 0:
+			randomIndex = rand.Intn(len(characters))
+			data += string(characters[randomIndex])
+		case 1:
+			randomIndex = rand.Intn(len(numbers))
+			data += string(numbers[randomIndex])
+		case 2:
+			randomIndex = rand.Intn(len(specials))
+			data += string(specials[randomIndex])
+		}
+	}
+
+	err := os.WriteFile(path, []byte(data), 0644)
+
+	PrintSuccess(message, err)
+	return err
+}
+
+// For both SSDs and HDDs
+func OverwriteFileEqualSize(path string) {}
 
 func RemoveFile(path string) error {
 	message := "File removed: " + path

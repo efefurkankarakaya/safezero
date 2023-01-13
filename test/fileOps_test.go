@@ -78,7 +78,7 @@ func TestFileOverwriting(t *testing.T) {
 
 		size = file.Size()
 
-		utils.OverwriteFile(path)
+		utils.OverwriteFileZeroBytes(path)
 
 		file, err = os.Stat(path)
 		if err != nil {

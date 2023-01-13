@@ -9,8 +9,68 @@ import (
 	"strings"
 )
 
+func DeleteFast(root string) {
+	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !fileInfo.IsDir() {
+			utils.OverwriteFileZeroBytes(path)
+			utils.RemoveFile(path)
+		}
+
+		return err
+	})
+	utils.ReflectError(err)
+
+	err = utils.RemoveTree(root)
+	utils.ReflectError(err)
+}
+
+func DeleteSecure(root string) {
+	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !fileInfo.IsDir() {
+			utils.OverwriteFileRandomSize(path)
+			utils.RemoveFile(path)
+		}
+
+		return err
+	})
+	utils.ReflectError(err)
+
+	err = utils.RemoveTree(root)
+	utils.ReflectError(err)
+}
+
+func DeleteSecurePlus(root string) {
+	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !fileInfo.IsDir() {
+			utils.OverwriteFileRandomSize(path)
+			utils.OverwriteFileZeroBytes(path)
+			utils.RemoveFile(path)
+		}
+
+		return err
+	})
+	utils.ReflectError(err)
+
+	err = utils.RemoveTree(root)
+	utils.ReflectError(err)
+}
+
+func Erase() {}
+
 func main() {
-	root := "./test/temp"
+	root := ""
 
 	criticalPaths := []string{
 		"",
@@ -29,25 +89,9 @@ func main() {
 		}
 	}
 
-	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !fileInfo.IsDir() {
-			println(path)
-			// utils.OverwriteFile(path)
-			// utils.RemoveFile(path)
-		}
-
-		return nil
-	})
-
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
-	utils.ReflectError(err)
+	DeleteSecure(root)
+	// DeleteFast(root)
+	// DeleteSecurePlus(root)
 
 	os.Exit(0)
 }

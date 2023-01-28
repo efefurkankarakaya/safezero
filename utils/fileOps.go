@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 	"io"
-	"io/fs" // TODO: Deprecated. Use instead os by adding unit tests.
+	"io/fs"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -36,8 +36,6 @@ func RemoveDirectory(path string) error {
 }
 
 func RemoveTree(root string) error {
-	// TODO: Remove tree.
-	// https://pkg.go.dev/os#RemoveAll
 	message := "Tree removed: " + root
 	err := os.RemoveAll(root)
 	PrintSuccess(message, err)
@@ -97,37 +95,69 @@ func OverwriteFileZeroBytes(path string) error {
 	return err
 }
 
-// For SSDs
+func generateRandomInteger(min int, max int) int {
+	rand.Seed(time.Now().UnixMicro())
+	return rand.Intn(max-min) + min
+}
+
+func getCharacters() []rune {
+	var characters []rune = []rune{
+		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'y', 'z', 'q', 'x', 'w',
+		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+		'\'', '"', '!', '^', '+', '%', '&', '/', '(', ')', '=', '?', '_', ',', ';', '.', '*', '-', '<', '>', '#', '$', '{', '}', '[', ']', '|',
+	}
+	return characters
+}
+
+func getRandomCharacter() string {
+	var characters []rune = getCharacters()
+	var randomIndex int
+	var randomCharacter string
+
+	randomIndex = generateRandomInteger(0, len(characters))
+	randomCharacter = string(characters[randomIndex])
+
+	return randomCharacter
+}
+
+func OverwriteFileFixedSize(path string) error {
+	// This size can be determined by the user, default value is default cluster size (4 KB)
+	// https://ux.stackexchange.com/questions/13815/files-size-units-kib-vs-kb-vs-kb
+	message := "File overwrote (with 4 KB size): " + path
+	var fileSize int
+	var data string
+
+	const clusterSize int = 4096
+
+	fileSize = clusterSize
+
+	for i := 0; i < fileSize; i++ {
+		data += getRandomCharacter()
+	}
+
+	err := os.WriteFile(path, []byte(data), 0644)
+
+	PrintSuccess(message, err)
+	return err
+}
+
 func OverwriteFileRandomSize(path string) error {
 	message := "File overwrote (with random size): " + path
-	var characterLength int
+	var fileSize int
 	var data string
-	var randomIndex int
 
-	var characters []rune = []rune{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'y', 'z', 'q', 'x', 'w'}
-	var numbers []rune = []rune{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
-	var specials []rune = []rune{'\'', '"', '!', '^', '+', '%', '&', '/', '(', ')', '=', '?', '_', ',', ';', '.', '*', '-', '<', '>', '#', '$', '{', '}', '[', ']', '|'}
+	const minSize int = 4096
+	// const maxSize int = 65536
 
-	rand.Seed(time.Now().UnixMicro())
-	const min int = 4095
-	const max int = 65535
+	// Picks a random file size between default cluster size and max size.
+	// fileSize = generateRandomInteger(minSize, maxSize)
 
-	characterLength = rand.Intn(max-min+1) + min
+	// 4 KB (default cluster size) = 1 Disk Access
+	// I think that should be faster than normal random length write operation. Especially in HDDs.
+	fileSize = minSize * generateRandomInteger(1, 17)
 
-	var typeOfCharacter int
-	for i := 0; i < characterLength; i++ {
-		typeOfCharacter = rand.Intn(3)
-		switch typeOfCharacter {
-		case 0:
-			randomIndex = rand.Intn(len(characters))
-			data += string(characters[randomIndex])
-		case 1:
-			randomIndex = rand.Intn(len(numbers))
-			data += string(numbers[randomIndex])
-		case 2:
-			randomIndex = rand.Intn(len(specials))
-			data += string(specials[randomIndex])
-		}
+	for i := 0; i < fileSize; i++ {
+		data += getRandomCharacter()
 	}
 
 	err := os.WriteFile(path, []byte(data), 0644)

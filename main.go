@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"io/fs"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"safezero/utils"
 	"strings"
+	"time"
 )
 
 func DeleteFast(root string) {
@@ -70,6 +72,8 @@ func DeleteSecurePlus(root string) {
 func Erase() {}
 
 func main() {
+	rand.Seed(time.Now().UnixMicro())
+
 	root := ""
 
 	criticalPaths := []string{

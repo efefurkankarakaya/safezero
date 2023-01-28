@@ -7,10 +7,16 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 // TODO: fileController.go?
+
+// For performance reasons, keeping this array as file-static.
+var characters []rune = []rune{
+	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'y', 'z', 'q', 'x', 'w',
+	'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+	'\'', '"', '!', '^', '+', '%', '&', '/', '(', ')', '=', '?', '_', ',', ';', '.', '*', '-', '<', '>', '#', '$', '{', '}', '[', ']', '|',
+}
 
 func CheckIfPathExists(path string) bool {
 	_, err := os.Stat(path)
@@ -96,16 +102,11 @@ func OverwriteFileZeroBytes(path string) error {
 }
 
 func generateRandomInteger(min int, max int) int {
-	rand.Seed(time.Now().UnixMicro())
 	return rand.Intn(max-min) + min
 }
 
 func getCharacters() []rune {
-	var characters []rune = []rune{
-		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'y', 'z', 'q', 'x', 'w',
-		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-		'\'', '"', '!', '^', '+', '%', '&', '/', '(', ')', '=', '?', '_', ',', ';', '.', '*', '-', '<', '>', '#', '$', '{', '}', '[', ']', '|',
-	}
+	// Defined above of the lines, as static.
 	return characters
 }
 
@@ -147,14 +148,14 @@ func OverwriteFileRandomSize(path string) error {
 	var data string
 
 	const minSize int = 4096
-	// const maxSize int = 65536
+	const maxSize int = 65536
 
 	// Picks a random file size between default cluster size and max size.
-	// fileSize = generateRandomInteger(minSize, maxSize)
+	fileSize = generateRandomInteger(minSize, maxSize)
 
 	// 4 KB (default cluster size) = 1 Disk Access
 	// I think that should be faster than normal random length write operation. Especially in HDDs.
-	fileSize = minSize * generateRandomInteger(1, 17)
+	// fileSize = minSize * generateRandomInteger(1, 17)
 
 	for i := 0; i < fileSize; i++ {
 		data += getRandomCharacter()

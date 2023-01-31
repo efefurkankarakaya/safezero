@@ -1,4 +1,4 @@
-package utils
+package file
 
 func CreateTestingFolder(root string) error {
 	// TODO: Consider os.TempDir()

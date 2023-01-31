@@ -6,7 +6,8 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"safezero/utils"
+	errorOperations "safezero/internal/error"
+	fileOperations "safezero/internal/file"
 	"strings"
 	"time"
 )
@@ -18,16 +19,16 @@ func DeleteFast(root string) {
 		}
 
 		if !fileInfo.IsDir() {
-			utils.OverwriteFileZeroBytes(path)
-			utils.RemoveFile(path)
+			fileOperations.OverwriteFileZeroBytes(path)
+			fileOperations.RemoveFile(path)
 		}
 
 		return err
 	})
-	utils.ReflectError(err)
+	errorOperations.ReflectError(err)
 
-	err = utils.RemoveTree(root)
-	utils.ReflectError(err)
+	err = fileOperations.RemoveTree(root)
+	errorOperations.ReflectError(err)
 }
 
 func DeleteSecure(root string) {
@@ -37,16 +38,16 @@ func DeleteSecure(root string) {
 		}
 
 		if !fileInfo.IsDir() {
-			utils.OverwriteFileFixedSize(path)
-			utils.RemoveFile(path)
+			fileOperations.OverwriteFileFixedSize(path)
+			fileOperations.RemoveFile(path)
 		}
 
 		return err
 	})
-	utils.ReflectError(err)
+	errorOperations.ReflectError(err)
 
-	err = utils.RemoveTree(root)
-	utils.ReflectError(err)
+	err = fileOperations.RemoveTree(root)
+	errorOperations.ReflectError(err)
 }
 
 func DeleteSecurePlus(root string) {
@@ -56,25 +57,26 @@ func DeleteSecurePlus(root string) {
 		}
 
 		if !fileInfo.IsDir() {
-			utils.OverwriteFileRandomSize(path)
-			utils.OverwriteFileZeroBytes(path)
-			utils.RemoveFile(path)
+			fileOperations.OverwriteFileRandomSize(path)
+			fileOperations.OverwriteFileZeroBytes(path)
+			fileOperations.RemoveFile(path)
 		}
 
 		return err
 	})
-	utils.ReflectError(err)
+	errorOperations.ReflectError(err)
 
-	err = utils.RemoveTree(root)
-	utils.ReflectError(err)
+	err = fileOperations.RemoveTree(root)
+	errorOperations.ReflectError(err)
 }
 
 func Erase() {}
 
 func main() {
+	// TODO: Should I consider cryptographic seed instead of time seed?
 	rand.Seed(time.Now().UnixMicro())
 
-	root := ""
+	root := "/Users/efefurkankarakaya/Downloads/contemporary"
 
 	criticalPaths := []string{
 		"",
@@ -92,9 +94,9 @@ func main() {
 		}
 	}
 
-	DeleteSecure(root)
+	// DeleteSecure(root)
 	// DeleteFast(root)
-	// DeleteSecurePlus(root)
+	DeleteSecurePlus(root)
 
 	os.Exit(0)
 }

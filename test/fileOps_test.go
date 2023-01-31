@@ -3,7 +3,7 @@ package test
 import (
 	"os"
 	"path/filepath"
-	"safezero/utils"
+	fileOperations "safezero/internal/file"
 	"testing"
 )
 
@@ -24,7 +24,7 @@ func TestCreatingTestingEnvironment(t *testing.T) {
 		t.Errorf(message)
 	}
 
-	err = utils.CreateTestingFolder(dir)
+	err = fileOperations.CreateTestingFolder(dir)
 
 	if err != nil {
 		println(err.Error())
@@ -32,7 +32,7 @@ func TestCreatingTestingEnvironment(t *testing.T) {
 		t.Errorf(message)
 	}
 
-	err = utils.CopyTestingFilesToTestingFolder(dir)
+	err = fileOperations.CopyTestingFilesToTestingFolder(dir)
 
 	if err != nil {
 		message = "Error occurred: CopyTestingFilesToTestingFolder"
@@ -40,7 +40,7 @@ func TestCreatingTestingEnvironment(t *testing.T) {
 	}
 
 	destination = "temp"
-	got = utils.CheckIfPathExists(destination)
+	got = fileOperations.CheckIfPathExists(destination)
 
 	if got != want {
 		message = "Failed. '" + destination + "' does not exist."
@@ -48,7 +48,7 @@ func TestCreatingTestingEnvironment(t *testing.T) {
 	}
 
 	destination = "temp/lotofen.jpg"
-	got = utils.CheckIfPathExists(destination)
+	got = fileOperations.CheckIfPathExists(destination)
 
 	if got != want {
 		message = "Failed. '" + destination + "' does not exist."
@@ -78,7 +78,7 @@ func TestFileOverwriting(t *testing.T) {
 
 		size = file.Size()
 
-		utils.OverwriteFileZeroBytes(path)
+		fileOperations.OverwriteFileZeroBytes(path)
 
 		file, err = os.Stat(path)
 		if err != nil {
@@ -112,8 +112,8 @@ func TestFileDeletion(t *testing.T) {
 
 		// TODO: Add remove directory here.
 		if !fileInfo.IsDir() {
-			utils.RemoveFile(path)
-			got = utils.CheckIfPathExists(path)
+			fileOperations.RemoveFile(path)
+			got = fileOperations.CheckIfPathExists(path)
 		}
 
 		return err
@@ -132,13 +132,13 @@ func TestTreeDeletion(t *testing.T) {
 	var got bool
 	var message string
 
-	err := utils.RemoveTree(testDir)
+	err := fileOperations.RemoveTree(testDir)
 	if err != nil {
 		message = "Error occurred while removing tree."
 		t.Errorf(message)
 	}
 
-	got = utils.CheckIfPathExists(testDir)
+	got = fileOperations.CheckIfPathExists(testDir)
 
 	if got != want {
 		message = "Could not removed tree."

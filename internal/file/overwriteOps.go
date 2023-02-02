@@ -20,16 +20,14 @@ func OverwriteFileFixedSize(path string) error {
 	// This size can be determined by the user, default value is default cluster size (4 KB)
 	// https://ux.stackexchange.com/questions/13815/files-size-units-kib-vs-kb-vs-kb
 	message := "File overwrote (with 4 KB size): " + path
-	var fileSize int
+	var fileSize int64
 	var data string
 
-	const clusterSize int = 4096
+	const clusterSize int64 = 4096
 
 	fileSize = clusterSize
 
-	for i := 0; i < fileSize; i++ {
-		data += utils.GetRandomCharacter()
-	}
+	data = utils.GetRandomString(fileSize)
 
 	err := os.WriteFile(path, []byte(data), 0644)
 
@@ -39,22 +37,20 @@ func OverwriteFileFixedSize(path string) error {
 
 func OverwriteFileRandomSize(path string) error {
 	message := "File overwrote (with random size): " + path
-	var fileSize int
+	var fileSize int64
 	var data string
 
-	const minSize int = 4096
-	const maxSize int = 65536
+	const minSize int64 = 4 * 1024
+	const maxSize int64 = 65 * 1024 * 1024
 
 	// Picks a random file size between default cluster size and max size.
 	fileSize = utils.GenerateRandomInteger(minSize, maxSize)
 
 	// 4 KB (default cluster size) = 1 Disk Access
-	// I think that should be faster than normal random length write operation. Especially in HDDs.
+	// I think that could be faster than normal random length write operation in some situations. Especially in HDDs.
 	// fileSize = minSize * generateRandomInteger(1, 17)
 
-	for i := 0; i < fileSize; i++ {
-		data += utils.GetRandomCharacter()
-	}
+	data = utils.GetRandomString(fileSize)
 
 	err := os.WriteFile(path, []byte(data), 0644)
 

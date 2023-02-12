@@ -2,81 +2,18 @@ package main
 
 import (
 	"fmt"
-	"io/fs"
 	"math/rand"
 	"os"
-	"path/filepath"
-	errorOperations "safezero/internal/error"
-	fileOperations "safezero/internal/file"
+	"safezero/cmd/safewipe"
 	"strings"
 	"time"
 )
-
-func DeleteFast(root string) {
-	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !fileInfo.IsDir() {
-			fileOperations.OverwriteFileZeroBytes(path)
-			fileOperations.RemoveFile(path)
-		}
-
-		return err
-	})
-	errorOperations.ReflectError(err)
-
-	err = fileOperations.RemoveTree(root)
-	errorOperations.ReflectError(err)
-}
-
-func DeleteSecure(root string) {
-	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !fileInfo.IsDir() {
-			fileOperations.OverwriteFileFixedSize(path)
-			fileOperations.RemoveFile(path)
-		}
-
-		return err
-	})
-	errorOperations.ReflectError(err)
-
-	err = fileOperations.RemoveTree(root)
-	errorOperations.ReflectError(err)
-}
-
-func DeleteSecurePlus(root string) {
-	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !fileInfo.IsDir() {
-			fileOperations.OverwriteFileRandomSize(path)
-			fileOperations.OverwriteFileZeroBytes(path)
-			fileOperations.RemoveFile(path)
-		}
-
-		return err
-	})
-	errorOperations.ReflectError(err)
-
-	err = fileOperations.RemoveTree(root)
-	errorOperations.ReflectError(err)
-}
-
-func Erase() {}
 
 func main() {
 	// TODO: Should I consider cryptographic seed instead of time seed?
 	rand.Seed(time.Now().UnixMicro())
 
-	root := "/Users/efefurkankarakaya/Downloads/contemporary"
+	root := ""
 
 	criticalPaths := []string{
 		"",
@@ -94,9 +31,10 @@ func main() {
 		}
 	}
 
-	// DeleteSecure(root)
+	// safedelete.DeleteSecure(root)
+	safewipe.WipeSafe(root)
 	// DeleteFast(root)
-	DeleteSecurePlus(root)
+	// DeleteSecurePlus(root)
 
 	os.Exit(0)
 }

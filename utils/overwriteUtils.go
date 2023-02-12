@@ -21,7 +21,7 @@ func GenerateRandomInteger(min int64, max int64) int64 {
 	return rand.Int63n(max-min) + min
 }
 
-func GetRandomString(fileSize int64) string {
+func GenerateRandomString(fileSize int64) string {
 	// Length of characters string is 89.
 	// (in 64-bit system) 89 = 000000...1011001, that means the lowest 7 bits represent 89 here and that's why we pick 7.
 	const numberOfCharacterIndexBits = 7

@@ -39,3 +39,31 @@ func WipeSafe(root string) {
 
 	println(time.Since(start))
 }
+
+func WipeSafePlus(root string, pass int) {
+	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		file, err := os.Stat(path)
+		if err != nil {
+			return err
+		}
+
+		size := file.Size()
+
+		if !fileInfo.IsDir() {
+			for i := 0; i < pass; i++ {
+				fileOperations.OverwriteFileFixedSize(path, size)
+			}
+			fileOperations.RemoveFile(path)
+		}
+
+		return err
+	})
+	errorOperations.ReflectError(err)
+
+	err = fileOperations.RemoveTree(root)
+	errorOperations.ReflectError(err)
+}

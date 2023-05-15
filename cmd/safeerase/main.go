@@ -1,0 +1,3 @@
+package safeerase
+
+func Erase() {}

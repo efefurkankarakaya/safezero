@@ -31,10 +31,9 @@ func main() {
 		}
 	}
 
+	// DeleteFast(root)
 	// safedelete.DeleteSecure(root)
 	safewipe.WipeSafe(root)
-	// DeleteFast(root)
-	// DeleteSecurePlus(root)
 
 	os.Exit(0)
 }

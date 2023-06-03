@@ -8,6 +8,9 @@ import (
 	"time"
 )
 
+// Attackers can notify all the files are 0 bytes and can trace clusters by patterns.
+// They won't know which clusters and chains belong to what but can be understood.
+// It provides more safety than any OS' default deletion algorithm but not safe.
 func DeleteFast(root string) {
 	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
 		if err != nil {
@@ -27,6 +30,9 @@ func DeleteFast(root string) {
 	errorOperations.ReflectError(err)
 }
 
+// Attackers can notify all the deleted files are the same size with cluster but tracing patterns are not that easy.
+// Divides a file into chunks of chains and makes untraceable by patterns or node links.
+// It provides average safety.
 func DeleteSecure(root string) {
 	// TODO: Remove time
 	start := time.Now()
@@ -54,24 +60,4 @@ func DeleteSecure(root string) {
 	errorOperations.ReflectError(err)
 
 	println(time.Since(start))
-}
-
-func DeleteSecurePlus(root string) {
-	err := filepath.Walk(root, func(path string, fileInfo fs.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if !fileInfo.IsDir() {
-			fileOperations.OverwriteFileRandomSize(path)
-			fileOperations.OverwriteFileZeroBytes(path)
-			fileOperations.RemoveFile(path)
-		}
-
-		return err
-	})
-	errorOperations.ReflectError(err)
-
-	err = fileOperations.RemoveTree(root)
-	errorOperations.ReflectError(err)
 }

@@ -1,6 +1,7 @@
 package file
 
 import (
+	"log"
 	"os"
 	errorManagement "safezero/internal/error"
 	"safezero/utils"
@@ -19,11 +20,52 @@ func OverwriteFileZeroBytes(path string) error {
 func OverwriteFileFixedSize(path string, size int64) error {
 	// This size can be determined by the user, default value is default cluster size (4 KB)
 	// https://ux.stackexchange.com/questions/13815/files-size-units-kib-vs-kb-vs-kb
+	err := error(nil)
 	message := "File overwrote (with fixed size): " + path
+	chunkSize := int64(68157440)
 
-	data := utils.GenerateRandomString(size)
+	// TODO: Chunk size should be increased for performance but how it can be optimized for every system?
+	if size < chunkSize {
+		data := utils.GenerateRandomString(size)
+		err = os.WriteFile(path, []byte(data), 0644)
+	} else {
+		// To keep memory usage under control.
+		sizeLeft := size
+		totalChunkWritten := int64(0)
 
-	err := os.WriteFile(path, []byte(data), 0644)
+		f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		errorManagement.ReflectError(err)
+
+		// fi, err := f.Stat()
+		// errorManagement.ReflectError(err)
+
+		for totalChunkWritten != size {
+			if totalChunkWritten > size {
+				println("[Chunk Overflow] This should not be happened.")
+				// TODO: An event / error log system required.
+				os.Exit(1)
+			}
+
+			data := utils.GenerateRandomString(chunkSize)
+
+			if _, err := f.Write([]byte(data)); err != nil {
+				f.Close() // FileWrite error
+				log.Fatal(err)
+				break
+			} else {
+				totalChunkWritten += chunkSize
+				sizeLeft -= chunkSize
+			}
+
+			if sizeLeft < chunkSize {
+				chunkSize = sizeLeft
+			}
+		}
+
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	errorManagement.PrintSuccess(message, err)
 	return err
